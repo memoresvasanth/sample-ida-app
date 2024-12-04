@@ -16,6 +16,7 @@ const App: React.FC = () => {
     <div className="App">
       <header className="App-header">
         <h1>Welcome to ResMed R&D</h1>
+        <h5>Version 1</h5>
         <p>{time}</p>
       </header>
     </div>
