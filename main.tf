@@ -138,10 +138,10 @@ resource "aws_codepipeline" "my_codepipeline" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        Owner      = "your-username"
-        Repo       = "your-repo"
+        Owner      = "memoriesvasanth"
+        Repo       = "sample-ida-app"
         Branch     = "main"
-        OAuthToken = "your-github-oauth-token"
+        OAuthToken = "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"
       }
     }
   }
