@@ -8,7 +8,7 @@ variable "account_id" {
 
 # Generate a random ID for unique resource names
 resource "random_id" "suffix" {
-  byte_length = 4
+  byte_length = 5
 }
 
 # Create ECR repository
