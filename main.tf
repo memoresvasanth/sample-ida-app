@@ -8,7 +8,7 @@ variable "account_id" {
 
 # Generate a random ID for unique resource names
 resource "random_id" "suffix" {
-  byte_length = 5
+  byte_length = 4
 }
 
 # Create ECR repository
@@ -68,7 +68,7 @@ resource "aws_codebuild_project" "my_codebuild" {
   }
   source {
     type            = "GITHUB"
-    location        = "https://github.com/your-username/your-repo.git"
+    location        = "https://github.com/memoresvasanth/sample-ida-app.git"
     buildspec       = <<EOF
 version: 0.2
 
@@ -138,7 +138,7 @@ resource "aws_codepipeline" "my_codepipeline" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        Owner      = "memoriesvasanth"
+        Owner      = "memoresvasanth"
         Repo       = "sample-ida-app"
         Branch     = "main"
         OAuthToken = "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"
