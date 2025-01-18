@@ -15,7 +15,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Welcome to EHR Co-Pilot</h1>
+        <h1>EHR Co-Pilot</h1>
         <p>{time}</p>
       </header>
     </div>
