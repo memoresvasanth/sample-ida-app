@@ -1,4 +1,4 @@
-name: Build and Push Docker Image to ECR
+name: Build and Deploy to ECS
 
 on:
   push:
@@ -34,5 +34,7 @@ jobs:
           docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/sample-ida-app-ecr:$IMAGE_TAG .
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/sample-ida-app-ecr:$IMAGE_TAG
 
-      - name: Logout from Amazon ECR
-        run: docker logout ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+      - name: Update ECS service
+        id: update-ecs
+        run: |
+          aws ecs update-service --cluster sample-ida-ecs-cluster --service sample-ida-ecs-service --force-new-deployment
