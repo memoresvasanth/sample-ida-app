@@ -94,15 +94,15 @@ resource "aws_ecs_task_definition" "sample_task" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "1024"
+  memory                   = "2048"
   container_definitions    = jsonencode([
     {
       name      = "sample-ida-ehr-crew"
       image     = "${var.account_id}.dkr.ecr.us-east-1.amazonaws.com/sample-ida-app-ecr:latest"
       essential = true
-      memory    = 512
-      cpu       = 256
+      memory    = 2048
+      cpu       = 1024
       portMappings = [
         {
           containerPort = 80
