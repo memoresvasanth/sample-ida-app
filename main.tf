@@ -19,15 +19,17 @@ resource "aws_vpc" "sample_vpc" {
 }
 
 resource "aws_subnet" "sample_subnet_1" {
-  vpc_id            = aws_vpc.sample_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id                  = aws_vpc.sample_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "sample_subnet_2" {
-  vpc_id            = aws_vpc.sample_vpc.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "us-east-1b"
+  vpc_id                  = aws_vpc.sample_vpc.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = true
 }
 
 resource "aws_internet_gateway" "sample_igw" {
@@ -65,11 +67,38 @@ resource "aws_ecs_cluster" "sample_ida_ecs_cluster" {
   name = "sample-ida-ecs-cluster"
 }
 
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecs-task-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy_attachment" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
 resource "aws_ecs_task_definition" "sample_task" {
-  family                   = "sample-task"
+  family                   = "sample-ida-ecs-task"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
   container_definitions    = jsonencode([
     {
-      name      = "ehr-co-pilot"
+      name      = "sample-ida-ehr-crew"
       image     = "${var.account_id}.dkr.ecr.us-east-1.amazonaws.com/sample-ida-app-ecr:latest"
       essential = true
       memory    = 512
@@ -80,6 +109,13 @@ resource "aws_ecs_task_definition" "sample_task" {
           hostPort      = 80
         }
       ]
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
     }
   ])
 }
@@ -89,56 +125,17 @@ resource "aws_ecs_service" "sample_ida_ecs_service" {
   cluster         = aws_ecs_cluster.sample_ida_ecs_cluster.id
   task_definition = aws_ecs_task_definition.sample_task.arn
   desired_count   = 1
-  launch_type     = "EC2"
-  load_balancer {
-    target_group_arn = aws_lb_target_group.sample_target_group.arn
-    container_name   = "ehr-co-pilot"
-    container_port   = 80
-  }
-
-  lifecycle {
-    ignore_changes = [desired_count]
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = [aws_subnet.sample_subnet_1.id, aws_subnet.sample_subnet_2.id]
+    security_groups  = [aws_security_group.ecs_service_sg.id]
+    assign_public_ip = true
   }
 }
 
-resource "aws_lb" "sample_lb" {
-  name               = "sample-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.lb_sg.id]
-  subnets            = [aws_subnet.sample_subnet_1.id, aws_subnet.sample_subnet_2.id]
-}
-
-resource "aws_lb_target_group" "sample_target_group" {
-  name     = "sample-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.sample_vpc.id
-
-  health_check {
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    matcher             = "200"
-  }
-}
-
-resource "aws_lb_listener" "sample_listener" {
-  load_balancer_arn = aws_lb.sample_lb.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.sample_target_group.arn
-  }
-}
-
-resource "aws_security_group" "lb_sg" {
-  name        = "lb-sg"
-  description = "Security group for load balancer"
+resource "aws_security_group" "ecs_service_sg" {
+  name        = "ecs-service-sg"
+  description = "Security group for ECS service"
   vpc_id      = aws_vpc.sample_vpc.id
 
   ingress {
@@ -154,70 +151,6 @@ resource "aws_security_group" "lb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "aws_security_group" "ecs_instance_sg" {
-  name        = "ecs-instance-sg"
-  description = "Security group for ECS instances"
-  vpc_id      = aws_vpc.sample_vpc.id
-
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_iam_role" "ecs_instance_role" {
-  name = "ecs-instance-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_instance_role_policy_attachment" {
-  role       = aws_iam_role.ecs_instance_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
-}
-
-resource "aws_instance" "ecs_instance" {
-  ami           = "ami-0de53d8956e8dcf80" # Amazon ECS-optimized AMI for us-east-1
-  instance_type = "t2.micro"
-  iam_instance_profile = aws_iam_instance_profile.ecs_instance_profile.name
-  vpc_security_group_ids = [aws_security_group.ecs_instance_sg.id]
-  subnet_id = aws_subnet.sample_subnet_1.id
-
-  user_data = <<-EOF
-              #!/bin/bash
-              echo ECS_CLUSTER=${aws_ecs_cluster.sample_ida_ecs_cluster.name} >> /etc/ecs/ecs.config
-              EOF
-
-  tags = {
-    Name = "ecs-instance"
-  }
-}
-
-resource "aws_iam_instance_profile" "ecs_instance_profile" {
-  name = "ecs-instance-profile"
-  role = aws_iam_role.ecs_instance_role.name
 }
 
 resource "aws_iam_role" "codebuild_role" {
