@@ -25,14 +25,14 @@ const Form: React.FC = () => {
           </FloatLabel>
         </div>
       </div>
-    <div className="grid justify-content-center mt-3">
-      <div className="col-auto">
-        <Button label="Submit" icon="pi pi-check" className="mr-2" />
+      <div className="grid justify-content-center mt-3">
+        <div className="col-auto">
+          <Button label="Save" icon="pi pi-check" className="mr-2 p-button-success" />
+        </div>
+        <div className="col-auto">
+          <Button label="Cancel" icon="pi pi-times" className="ml-2 p-button-secondary" />
+        </div>
       </div>
-      <div className="col-auto">
-        <Button label="Cancel" icon="pi pi-times" className="ml-2 p-button-secondary" />
-      </div>
-    </div>
     </div>
   );
 }
