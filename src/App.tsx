@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Menubar } from 'primereact/menubar';
+import { Menu } from 'primereact/menu';
 import 'primereact/resources/themes/saga-blue/theme.css';  // Theme
 import 'primereact/resources/primereact.min.css';          // Core CSS
 import 'primeicons/primeicons.css';                        // Icons
@@ -9,6 +10,8 @@ import './App.css';  // Import your custom styles
 import Form from './Form';
 
 const App: React.FC = () => {
+  const menu = useRef<Menu>(null);
+
   const items = [
     {
       label: 'Home',
@@ -32,12 +35,26 @@ const App: React.FC = () => {
     }
   ];
 
-  const start = <img alt="logo" src="ResMed_logo.jpg" height="40" className="logo"></img>;
+  const userMenuItems = [
+    { label: 'John Doe', icon: 'pi pi-user', disabled: true },
+    { separator: true },
+    { label: 'Settings', icon: 'pi pi-cog' },
+    { label: 'Change Password', icon: 'pi pi-key' },
+    { label: 'Logout', icon: 'pi pi-sign-out' }
+  ];
+
+  const start = <img alt="logo" src="ResMed_logo.jpg" height="60" className="logo"></img>;
+  const end = (
+    <div className="user-icon" onClick={(event) => menu.current?.toggle(event)} style={{ cursor: 'pointer' }}>
+      <i className="pi pi-user" style={{ fontSize: '1.5em' }}></i>
+      <Menu model={userMenuItems} popup ref={menu} />
+    </div>
+  );
 
   return (
     <Router>
       <div className="App">
-        <Menubar model={items} start={start} />
+        <Menubar model={items} start={start} end={end} />
         <Routes>
           <Route path="/" element={
             <header className="App-header">
