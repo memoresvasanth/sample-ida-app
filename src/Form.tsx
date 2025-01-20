@@ -6,34 +6,33 @@ import 'primereact/resources/themes/saga-blue/theme.css';  // Theme
 import 'primereact/resources/primereact.min.css';          // Core CSS
 import 'primeicons/primeicons.css';                        // Icons
 import 'primeflex/primeflex.css';                          // PrimeFlex
-import 'bootstrap/dist/css/bootstrap.min.css';             // Bootstrap CSS
 import './Form.css';  // Import your custom styles
 
 const Form: React.FC = () => {
   return (
-    <div className="form-page container-fluid">
-      <div className="row mt-3 mb-3">
-        <div className="col-md-6">
-          <div className="p-float-label w-100">
+    <div className="form-page p-fluid p-mt-5">
+      <div className="grid mt-3 p-mb-3">
+        <div className="col-12 md:col-6">
+          <FloatLabel>
             <InputText id="firstName" className="w-100" />
-            <label htmlFor="firstName">Patient First Name</label>
-          </div>
+            <label htmlFor="firstName">First Name</label>
+          </FloatLabel>
         </div>
-        <div className="col-md-6">
-          <div className="p-float-label w-100">
+        <div className="col-12 md:col-6">
+          <FloatLabel>
             <InputText id="lastName" className="w-100" />
-            <label htmlFor="lastName">Patient Last Name</label>
-          </div>
+            <label htmlFor="lastName">Last Name</label>
+          </FloatLabel>
         </div>
       </div>
-      <div className="row justify-content-center">
-        <div className="col-auto">
-          <Button label="Submit" icon="pi pi-check" className="mr-2" />
-        </div>
-        <div className="col-auto">
-          <Button label="Cancel" icon="pi pi-times" className="p-button-secondary" />
-        </div>
+    <div className="grid justify-content-center mt-3">
+      <div className="col-auto">
+        <Button label="Submit" icon="pi pi-check" className="mr-2" />
       </div>
+      <div className="col-auto">
+        <Button label="Cancel" icon="pi pi-times" className="ml-2 p-button-secondary" />
+      </div>
+    </div>
     </div>
   );
 }
