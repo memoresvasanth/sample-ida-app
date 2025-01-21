@@ -8,7 +8,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { MultiSelect } from 'primereact/multiselect';
 import { Sidebar } from 'primereact/sidebar';
 import { Toast } from 'primereact/toast';
-import { Message } from 'primereact/message';
+import { FileUpload } from 'primereact/fileupload';
 import 'primereact/resources/themes/saga-blue/theme.css';  // Theme
 import 'primereact/resources/primereact.min.css';          // Core CSS
 import 'primeicons/primeicons.css';                        // Icons
@@ -29,7 +29,6 @@ const Form: React.FC = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const [showUpload, setShowUpload] = useState<boolean>(false);
   const [showSummary, setShowSummary] = useState<boolean>(false);
-  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
   const toast = useRef<Toast>(null);
 
   const genderOptions = [
@@ -70,7 +69,6 @@ const Form: React.FC = () => {
   const handleUpload = (event: any) => {
     setShowUpload(false);
     setShowSummary(true);
-    setUploadMessage("Successfully loaded the information from the file");
   };
 
   return (
@@ -164,31 +162,148 @@ const Form: React.FC = () => {
           <span className="p-inputgroup">
             <InputText placeholder="Type a message" />
             <Button icon="pi pi-send" className="p-button-primary" />
-            <Button icon="pi pi-paperclip" className="p-button-secondary" onClick={handleUploadClick} />
+            <FileUpload name="demo[]" accept="application/pdf" customUpload uploadHandler={handleUpload} mode="basic" auto chooseLabel="Select File" className="p-button-secondary" />
             <Button icon="pi pi-microphone" className="p-button-secondary" />
           </span>
         </div>
-        {showUpload && (
-          <div className="file-upload-button">
-            <Button label="Upload File" icon="pi pi-upload" className="p-button-primary" onClick={handleUpload} />
-          </div>
-        )}
         {showSummary && (
-          <div className="summary">
+            <div className="summary">
             <h4>Summary</h4>
-            <p>First Name: John <i className="pi pi-check"></i></p>
-            <p>Last Name: Doe <i className="pi pi-check"></i></p>
-            <p>DOB: 01/01/1986 <i className="pi pi-check"></i></p>
-            <p>Gender: Male <i className="pi pi-check"></i></p>
-            <p>Age: 67 <i className="pi pi-check"></i></p>
-            <p>Race: White <i className="pi pi-check"></i></p>
-            <p>Marital Status: Married <i className="pi pi-check"></i></p>
-            <p>Preferred Language: English <i className="pi pi-check"></i></p>
-            <p>Smoking Status: Smoker <i className="pi pi-check"></i></p>
-            <p>Medical Record #: 12345 <i className="pi pi-check"></i></p>
-          </div>
+            <p>
+              <Button
+              icon={firstName === 'John' ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${firstName === 'John' ? 'p-button-success' : ''}`}
+              onClick={() => setFirstName(firstName === 'John' ? null : 'John')}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              First Name: <strong>{firstName || 'John'}</strong>
+              </span>
+            </p>
+            
+            <p>
+              <Button
+              icon={lastName === 'Doe' ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${lastName === 'Doe' ? 'p-button-success' : ''}`}
+              onClick={() => setLastName(lastName === 'Doe' ? null : 'Doe')}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              Last Name: <strong>{lastName || 'Doe'}</strong>
+              </span>
+            </p>
+            <p>
+              <Button
+              icon={dateOfBirth?.toDateString() === new Date('1986-01-01').toDateString() ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${dateOfBirth?.toDateString() === new Date('1986-01-01').toDateString() ? 'p-button-success' : ''}`}
+              onClick={() => setDateOfBirth(dateOfBirth?.toDateString() === new Date('1986-01-01').toDateString() ? null : new Date('1986-01-01'))}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              DOB: <strong>{dateOfBirth ? dateOfBirth.toDateString() : '01/01/1986'}</strong>
+              </span>
+            </p>
+            <p>
+              <Button
+              icon={gender === 'Male' ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${gender === 'Male' ? 'p-button-success' : ''}`}
+              onClick={() => setGender(gender === 'Male' ? null : 'Male')}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              Gender: <strong>{gender || 'Male'}</strong>
+              </span>
+            </p>
+            <p>
+              <Button
+              icon={age === 67 ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${age === 67 ? 'p-button-success' : ''}`}
+              onClick={() => setAge(age === 67 ? null : 67)}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              Age: <strong>{age !== null ? age : '67'}</strong>
+              </span>
+            </p>
+            <p>
+              <Button
+              icon={race.includes('White') ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${race.includes('White') ? 'p-button-success' : ''}`}
+              onClick={() => setRace(race.includes('White') ? [] : ['White'])}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              Race: <strong>{race.includes('White') ? 'White' : 'White'}</strong>
+              </span>
+            </p>
+            <p>
+              <Button
+              icon={maritalStatus === 'Married' ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${maritalStatus === 'Married' ? 'p-button-success' : ''}`}
+              onClick={() => setMaritalStatus(maritalStatus === 'Married' ? null : 'Married')}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              Marital Status: <strong>{maritalStatus || 'Married'}</strong>
+              </span>
+            </p>
+            <p>
+              <Button
+              icon={preferredLanguage === 'English' ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${preferredLanguage === 'English' ? 'p-button-success' : ''}`}
+              onClick={() => setPreferredLanguage(preferredLanguage === 'English' ? null : 'English')}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              Preferred Language: <strong>{preferredLanguage || 'English'}</strong>
+              </span>
+            </p>
+            <p>
+              <Button
+              icon={smokingStatus === 'Smoker' ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${smokingStatus === 'Smoker' ? 'p-button-success' : ''}`}
+              onClick={() => setSmokingStatus(smokingStatus === 'Smoker' ? null : 'Smoker')}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              Smoking Status: <strong>{smokingStatus || 'Smoker'}</strong>
+              </span>
+            </p>
+            <p>
+              <Button
+              icon={medicalRecord === '12345' ? "pi pi-check" : "pi pi-arrow-left"}
+              className={`p-button-primary p-button-sm p-button-square ${medicalRecord === '12345' ? 'p-button-success' : ''}`}
+              onClick={() => setMedicalRecord(medicalRecord === '12345' ? null : '12345')}
+              />
+              <span className="summary-text" style={{ paddingLeft: '10px' }}>
+              Medical Record #: <strong>{medicalRecord || '12345'}</strong>
+              </span>
+            </p>
+            <Button 
+              label={firstName === 'John' && lastName === 'Doe' && dateOfBirth?.toDateString() === new Date('1986-01-01').toDateString() && gender === 'Male' && age === 67 && race.includes('White') && maritalStatus === 'Married' && preferredLanguage === 'English' && smokingStatus === 'Smoker' && medicalRecord === '12345' ? "Revert All" : "Apply All"} 
+              icon={firstName === 'John' && lastName === 'Doe' && dateOfBirth?.toDateString() === new Date('1986-01-01').toDateString() && gender === 'Male' && age === 67 && race.includes('White') && maritalStatus === 'Married' && preferredLanguage === 'English' && smokingStatus === 'Smoker' && medicalRecord === '12345' ? "pi pi-arrow-right" : "pi pi-arrow-left"} 
+              className="p-button-primary" 
+              style={{ marginTop: '10px' }} 
+              onClick={() => {
+              const allSet = firstName === 'John' && lastName === 'Doe' && dateOfBirth?.toDateString() === new Date('1986-01-01').toDateString() && gender === 'Male' && age === 67 && race.includes('White') && maritalStatus === 'Married' && preferredLanguage === 'English' && smokingStatus === 'Smoker' && medicalRecord === '12345';
+              if (allSet) {
+              setFirstName(null);
+              setLastName(null);
+              setDateOfBirth(null);
+              setGender(null);
+              setAge(null);
+              setRace([]);
+              setMaritalStatus(null);
+              setPreferredLanguage(null);
+              setSmokingStatus(null);
+              setMedicalRecord(null);
+              } else {
+              setFirstName('John');
+              setLastName('Doe');
+              setDateOfBirth(new Date('1986-01-01'));
+              setGender('Male');
+              setAge(67);
+              setRace(['White']);
+              setMaritalStatus('Married');
+              setPreferredLanguage('English');
+              setSmokingStatus('Smoker');
+              setMedicalRecord('12345');
+              }
+              }}
+            />
+            </div>
         )}
-        {uploadMessage && <Message severity="success" text={uploadMessage} />}
       </Sidebar>
     </div>
   );
