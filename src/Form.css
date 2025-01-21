@@ -19,3 +19,75 @@
   justify-content: center;
   align-items: center;
 }
+
+.chat-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  padding-right: 1rem;
+}
+
+
+
+
+.chat-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  padding-right: 1rem;
+}
+
+.summary {
+  margin-top: 1rem;
+}
+
+.sidebar-search {
+  position: absolute;
+  bottom: 20px;
+  width: 90%;
+  left: 5%;
+}
+
+.p-inputgroup .p-button {
+  margin-left: 0.5rem;
+}
+
+.p-inputgroup .p-inputtext {
+  flex: 1;
+}
