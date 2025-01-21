@@ -8,6 +8,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { MultiSelect } from 'primereact/multiselect';
 import { Sidebar } from 'primereact/sidebar';
 import { Toast } from 'primereact/toast';
+import { Message } from 'primereact/message';
 import 'primereact/resources/themes/saga-blue/theme.css';  // Theme
 import 'primereact/resources/primereact.min.css';          // Core CSS
 import 'primeicons/primeicons.css';                        // Icons
@@ -26,7 +27,9 @@ const Form: React.FC = () => {
   const [smokingStatus, setSmokingStatus] = useState<string | null>(null);
   const [medicalRecord, setMedicalRecord] = useState<string | null>(null);
   const [visible, setVisible] = useState<boolean>(false);
+  const [showUpload, setShowUpload] = useState<boolean>(false);
   const [showSummary, setShowSummary] = useState<boolean>(false);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
   const toast = useRef<Toast>(null);
 
   const genderOptions = [
@@ -61,8 +64,13 @@ const Form: React.FC = () => {
   ];
 
   const handleUploadClick = () => {
-    toast.current?.show({ severity: 'info', summary: 'Info', detail: 'Clicked the upload icon', life: 3000 });
+    setShowUpload(true);
+  };
+
+  const handleUpload = (event: any) => {
+    setShowUpload(false);
     setShowSummary(true);
+    setUploadMessage("Successfully loaded the information from the file");
   };
 
   return (
@@ -160,14 +168,27 @@ const Form: React.FC = () => {
             <Button icon="pi pi-microphone" className="p-button-secondary" />
           </span>
         </div>
+        {showUpload && (
+          <div className="file-upload-button">
+            <Button label="Upload File" icon="pi pi-upload" className="p-button-primary" onClick={handleUpload} />
+          </div>
+        )}
         {showSummary && (
           <div className="summary">
             <h4>Summary</h4>
-            <p>First Name: John</p>
-            <p>Last Name: Doe</p>
-            <Button label="Apply" icon="pi pi-check" className="p-button-success mt-2" />
+            <p>First Name: John <i className="pi pi-check"></i></p>
+            <p>Last Name: Doe <i className="pi pi-check"></i></p>
+            <p>DOB: 01/01/1986 <i className="pi pi-check"></i></p>
+            <p>Gender: Male <i className="pi pi-check"></i></p>
+            <p>Age: 67 <i className="pi pi-check"></i></p>
+            <p>Race: White <i className="pi pi-check"></i></p>
+            <p>Marital Status: Married <i className="pi pi-check"></i></p>
+            <p>Preferred Language: English <i className="pi pi-check"></i></p>
+            <p>Smoking Status: Smoker <i className="pi pi-check"></i></p>
+            <p>Medical Record #: 12345 <i className="pi pi-check"></i></p>
           </div>
         )}
+        {uploadMessage && <Message severity="success" text={uploadMessage} />}
       </Sidebar>
     </div>
   );
