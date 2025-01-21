@@ -68,16 +68,23 @@ const Form: React.FC = () => {
 
   const handleUpload = (event: any) => {
     setShowUpload(false);
-    setShowSummary(true);
+    if (toast.current) {
+      toast.current.show({ severity: 'info', summary: 'Uploading...', detail: 'Please wait', life: 3000 });
+    }
+    setTimeout(() => {
+      setShowSummary(true);
+      const inputElement = document.querySelector('.sidebar-search input');
+      if (inputElement) {
+      (inputElement as HTMLInputElement).value = '';
+      }
+    }, 3000);
   };
 
   return (
     <div className="form-page p-fluid">
       <Toast ref={toast} />
-      <div className="grid mt-3 mb-3">
-        <div className="col-12 md:col-6">
-          <h2>Patient Information</h2>
-        </div>
+      <div className="mt-3 mb-3 text-left">
+        <h2>Patient Information</h2>
       </div>
       <div className="grid mt-3 mb-3">
         <div className="col-12 md:col-6">
@@ -163,12 +170,45 @@ const Form: React.FC = () => {
           <h3>EHR Crew</h3>
         </div>
         <div className="sidebar-search">
-          <span className="p-inputgroup">
-            <InputText placeholder="Type a message" />
-            <Button icon="pi pi-send" className="p-button-primary" />
-            <FileUpload name="demo[]" accept="application/pdf" customUpload uploadHandler={handleUpload} mode="basic" auto chooseLabel="Select File" className="p-button-secondary" />
+            <span className="p-inputgroup">
+            <InputText 
+              placeholder="Type a message" 
+              // onKeyPress={(e) => {
+              // if (e.key === 'Enter') {
+              // setShowUpload(true);
+              // }
+              // }} 
+              onPaste={(e) => {
+              const items = e.clipboardData.items;
+              for (let i = 0; i < items.length; i++) {
+              if (items[i].kind === 'file' && items[i].type === 'application/pdf') {
+              const file = items[i].getAsFile();
+              if (file) {
+                handleUpload({ files: [file] });
+              }
+              }
+              }
+              }}
+            />
+            <Button 
+              icon="pi pi-send" 
+              className="p-button-primary" 
+              onClick={() => setShowUpload(true)} 
+            />
             <Button icon="pi pi-microphone" className="p-button-secondary" />
-          </span>
+            </span>
+            {showUpload && (
+              <FileUpload 
+              name="demo[]" 
+              accept="application/pdf" 
+              customUpload 
+              uploadHandler={handleUpload} 
+              mode="basic" 
+              auto 
+              chooseLabel="Select File" 
+              className="p-button-secondary mt-2" 
+              />
+            )}
         </div>
         {showSummary && (
             <div className="summary">
@@ -177,7 +217,7 @@ const Form: React.FC = () => {
               <Button
               icon={firstName === 'John' ? "pi pi-check" : "pi pi-arrow-left"}
               className={`p-button-primary p-button-sm p-button-square ${firstName === 'John' ? 'p-button-success' : ''}`}
-              onClick={() => setFirstName(firstName === 'John' ? null : 'John')}
+              onClick={() => setFirstName(firstName === 'John' ? '' : 'John')}
               />
               <span className="summary-text" style={{ paddingLeft: '10px' }}>
               First Name: <strong>{firstName || 'John'}</strong>
@@ -188,7 +228,7 @@ const Form: React.FC = () => {
               <Button
               icon={lastName === 'Doe' ? "pi pi-check" : "pi pi-arrow-left"}
               className={`p-button-primary p-button-sm p-button-square ${lastName === 'Doe' ? 'p-button-success' : ''}`}
-              onClick={() => setLastName(lastName === 'Doe' ? null : 'Doe')}
+              onClick={() => setLastName(lastName === 'Doe' ? '' : 'Doe')}
               />
               <span className="summary-text" style={{ paddingLeft: '10px' }}>
               Last Name: <strong>{lastName || 'Doe'}</strong>
@@ -268,7 +308,7 @@ const Form: React.FC = () => {
               <Button
               icon={medicalRecord === '12345' ? "pi pi-check" : "pi pi-arrow-left"}
               className={`p-button-primary p-button-sm p-button-square ${medicalRecord === '12345' ? 'p-button-success' : ''}`}
-              onClick={() => setMedicalRecord(medicalRecord === '12345' ? null : '12345')}
+              onClick={() => setMedicalRecord(medicalRecord === '12345' ? '' : '12345')}
               />
               <span className="summary-text" style={{ paddingLeft: '10px' }}>
               Medical Record #: <strong>{medicalRecord || '12345'}</strong>
@@ -282,8 +322,8 @@ const Form: React.FC = () => {
               onClick={() => {
               const allSet = firstName === 'John' && lastName === 'Doe' && dateOfBirth?.toDateString() === new Date('1986-01-01').toDateString() && gender === 'Male' && age === 67 && race.includes('White') && maritalStatus === 'Married' && preferredLanguage === 'English' && smokingStatus === 'Smoker' && medicalRecord === '12345';
               if (allSet) {
-              setFirstName(null);
-              setLastName(null);
+              setFirstName('');
+              setLastName('');
               setDateOfBirth(null);
               setGender(null);
               setAge(null);
@@ -291,7 +331,7 @@ const Form: React.FC = () => {
               setMaritalStatus(null);
               setPreferredLanguage(null);
               setSmokingStatus(null);
-              setMedicalRecord(null);
+              setMedicalRecord('');
               } else {
               setFirstName('John');
               setLastName('Doe');
