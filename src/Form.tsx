@@ -74,7 +74,11 @@ const Form: React.FC = () => {
   return (
     <div className="form-page p-fluid">
       <Toast ref={toast} />
-      <h2>Patient Information</h2>
+      <div className="grid mt-3 mb-3">
+        <div className="col-12 md:col-6">
+          <h2>Patient Information</h2>
+        </div>
+      </div>
       <div className="grid mt-3 mb-3">
         <div className="col-12 md:col-6">
           <FloatLabel>
