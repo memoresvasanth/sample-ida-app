@@ -62,9 +62,6 @@ const Form: React.FC = () => {
     { label: 'Heavy Smoker', value: 'Heavy Smoker' }
   ];
 
-  const handleUploadClick = () => {
-    setShowUpload(true);
-  };
 
   const handleUpload = (event: any) => {
     setShowUpload(false);
