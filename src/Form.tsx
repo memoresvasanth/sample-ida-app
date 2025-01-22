@@ -34,7 +34,7 @@ const Form: React.FC = () => {
   const genderOptions = [
     { label: 'Male', value: 'Male' },
     { label: 'Female', value: 'Female' },
-    { label: 'Others', value: 'Others' }
+    { label: 'Unknown', value: 'Unknown' }
   ];
 
   const raceOptions = [

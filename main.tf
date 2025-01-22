@@ -113,19 +113,6 @@ resource "aws_ecs_task_definition" "sample_task" {
   ])
 }
 
-resource "aws_ecs_service" "sample_ida_ecs_service" {
-  name            = "sample-ida-ecs-service"
-  cluster         = aws_ecs_cluster.sample_ida_ecs_cluster.id
-  task_definition = aws_ecs_task_definition.sample_task.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-  network_configuration {
-    subnets          = [aws_subnet.sample_subnet_1.id, aws_subnet.sample_subnet_2.id]
-    security_groups  = [aws_security_group.ecs_service_sg.id]
-    assign_public_ip = true
-  }
-}
-
 resource "aws_security_group" "ecs_service_sg" {
   name        = "ecs-service-sg"
   description = "Security group for ECS service"
@@ -143,6 +130,60 @@ resource "aws_security_group" "ecs_service_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_lb" "sample_lb" {
+  name               = "sample-lb-2"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.ecs_service_sg.id]
+  subnets            = [aws_subnet.sample_subnet_1.id, aws_subnet.sample_subnet_2.id]
+}
+
+resource "aws_lb_target_group" "sample_tg" {
+  name        = "sample-tg-2"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.sample_vpc.id
+  target_type = "ip"  # Update target type to ip
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200-299"
+  }
+}
+
+resource "aws_lb_listener" "sample_listener" {
+  load_balancer_arn = aws_lb.sample_lb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.sample_tg.arn
+  }
+}
+
+resource "aws_ecs_service" "sample_ida_ecs_service" {
+  name            = "sample-ida-ecs-service"
+  cluster         = aws_ecs_cluster.sample_ida_ecs_cluster.id
+  task_definition = aws_ecs_task_definition.sample_task.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+  network_configuration {
+    subnets          = [aws_subnet.sample_subnet_1.id, aws_subnet.sample_subnet_2.id]
+    security_groups  = [aws_security_group.ecs_service_sg.id]
+    assign_public_ip = true
+  }
+  load_balancer {
+    target_group_arn = aws_lb_target_group.sample_tg.arn
+    container_name   = "sample-ida-ehr-crew"
+    container_port   = 80
   }
 }
 
