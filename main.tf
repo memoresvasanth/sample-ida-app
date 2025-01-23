@@ -105,8 +105,8 @@ resource "aws_ecs_task_definition" "sample_task" {
       cpu       = 1024
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 3000  # Application listens on port 3000
+          hostPort      = 3000  # Map to host port 3000
         }
       ]
     }
@@ -119,10 +119,38 @@ resource "aws_security_group" "ecs_service_sg" {
   vpc_id      = aws_vpc.sample_vpc.id
 
   ingress {
-    from_port   = 80
+    from_port   = 80  # Allow traffic on port 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 3000  # Allow traffic on port 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["49.37.200.37/32"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["152.58.221.175/32"]
+  }
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["111.93.224.210/32"]
   }
 
   egress {
@@ -143,15 +171,15 @@ resource "aws_lb" "sample_lb" {
 
 resource "aws_lb_target_group" "sample_tg" {
   name        = "sample-tg-2"
-  port        = 80
+  port        = 3000  # Target group port set to 3000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.sample_vpc.id
-  target_type = "ip"  # Update target type to ip
+  target_type = "ip"  # Ensure target type is ip
 
   health_check {
-    path                = "/"
+    path                = "/"  # Ensure this path is correct for your application
     interval            = 30
-    timeout             = 5
+    timeout             = 10  # Increase timeout to 10 seconds
     healthy_threshold   = 2
     unhealthy_threshold = 2
     matcher             = "200-299"
@@ -183,7 +211,23 @@ resource "aws_ecs_service" "sample_ida_ecs_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.sample_tg.arn
     container_name   = "sample-ida-ehr-crew"
-    container_port   = 80
+    container_port   = 3000  # Map to container port 3000
+  }
+}
+
+resource "aws_route53_zone" "sample_zone" {
+  name = "me-mores.com"
+}
+
+resource "aws_route53_record" "sample_record" {
+  zone_id = aws_route53_zone.sample_zone.zone_id
+  name    = "ehr-crew-demo.me-mores.com"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.sample_lb.dns_name
+    zone_id                = aws_lb.sample_lb.zone_id
+    evaluate_target_health = true
   }
 }
 
