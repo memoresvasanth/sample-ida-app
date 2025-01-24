@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '\\.(css|less|scss|sass)$': '<rootDir>/__mocks__/styleMock.js'
     '^react(.*)$': '<rootDir>/node_modules/react$1',
     '^react-dom(.*)$': '<rootDir>/node_modules/react-dom$1',
     '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom$1',
