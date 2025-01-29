@@ -31,10 +31,10 @@ jobs:
         id: build-image
         run: |
           IMAGE_TAG=latest
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/sample-ida-app-service-ecr:$IMAGE_TAG .
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/sample-ida-app-service-ecr:$IMAGE_TAG
+          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/sample-ida-app-ecr:$IMAGE_TAG .
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/sample-ida-app-ecr:$IMAGE_TAG
 
       - name: Update ECS service
         id: update-ecs
         run: |
-          aws ecs update-service --cluster sample-ida-ecs-service-cluster --service sample-ida-service-ecs-service --force-new-deployment
+          aws ecs update-service --cluster sample-ida-ecs-cluster --service sample-ida-ecs-service --force-new-deployment
