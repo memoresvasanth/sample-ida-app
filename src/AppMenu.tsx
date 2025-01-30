@@ -24,7 +24,7 @@ const AppMenu: React.FC = () => {
     {
       label: 'Document',
       icon: 'pi pi-fw pi-file',
-      command: () => { window.location.pathname = "/document"; }
+      command: () => { window.location.pathname = "/document-home"; }
     }
   ];
 
