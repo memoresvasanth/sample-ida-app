@@ -89,8 +89,8 @@ const InteractionComponent: React.FC = () => {
     };
 
     return (
-        <div style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: 'white', padding: '10px', boxShadow: '0 -2px 5px rgba(0,0,0,0.1)' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px', marginTop: '10px' }}>
+        <div style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: 'white', padding: '5px', boxShadow: '0 -2px 5px rgba(0,0,0,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0px', marginTop: '0px' }}>
                 <Button label={recording ? "Stop" : "Start"} onClick={recording ? stopRecording : startRecording} style={{ margin: '10px' }} />
                 <Button label="Play" onClick={() => audioRef.current?.play()} disabled={!audioBlob} style={{ margin: '10px' }} />
                 <Button label="Send" onClick={sendRecording} disabled={!audioBlob} style={{ margin: '10px' }} />

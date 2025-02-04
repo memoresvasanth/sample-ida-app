@@ -2,9 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FileUpload } from 'primereact/fileupload';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Button } from 'primereact/button';
-import { Menubar } from 'primereact/menubar';
-import { MenuItem } from 'primereact/menuitem';
-import { ProgressSpinner } from 'primereact/progressspinner';
 import axios from 'axios';
 import InteractionComponent from './InteractionComponent';
 
@@ -13,7 +10,6 @@ const DocumentHome: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [fileStatus, setFileStatus] = useState<string>('Pending');
-    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const overlayPanelRef = useRef<OverlayPanel>(null);
 
     useEffect(() => {
@@ -37,7 +33,6 @@ const DocumentHome: React.FC = () => {
             });
             setSummary(response.data.summary);
             setFileStatus('Uploaded');
-            setPdfUrl(URL.createObjectURL(file));
         } catch (error) {
             console.error('Error uploading file:', error);
             setFileStatus('Error');
@@ -50,7 +45,6 @@ const DocumentHome: React.FC = () => {
         setSummary('');
         setUploadedFile(null);
         setFileStatus('Pending');
-        setPdfUrl(null);
     };
 
     const showOverlay = (event: any) => {
@@ -59,45 +53,23 @@ const DocumentHome: React.FC = () => {
         }
     };
 
-    const items: MenuItem[] = [
-        {
-            label: 'Recommendation',
-            command: showOverlay
-        }
-    ];
-
-    const start = (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h1 style={{ marginLeft: '10px' }}>Document Home</h1>
-        </div>
-    );
-
     return (
         <div>
-            <Menubar model={items} start={start} />
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                <h1>Document Home</h1>
+            </div>
             <FileUpload name="file" customUpload uploadHandler={onUpload} onClear={clear} accept="application/pdf" maxFileSize={1000000} />
-            {loading && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                    <ProgressSpinner />
-                </div>
-            )}
-            {summary && pdfUrl && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-                    <div style={{ width: '45%' }}>
-                        <h2>Summary</h2>
-                        <p>{summary}</p>
-                    </div>
-                    <div style={{ width: '45%' }}>
-                        <h2>Uploaded PDF</h2>
-                        <iframe src={pdfUrl} width="100%" height="500px" />
-                    </div>
-                </div>
-            )}
             <OverlayPanel ref={overlayPanelRef}>
                 <div style={{ padding: '10px' }}>
                     <Button label="Submit" />
                 </div>
             </OverlayPanel>
+            {summary && (
+                <div style={{ marginTop: '20px' }}>
+                    <h2>Summary</h2>
+                    <p>{summary}</p>
+                </div>
+            )}
             <InteractionComponent />
         </div>
     );
