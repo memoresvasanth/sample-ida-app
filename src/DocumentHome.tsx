@@ -58,7 +58,16 @@ const DocumentHome: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                 <h1>Document Home</h1>
             </div>
-            <FileUpload name="file" customUpload uploadHandler={onUpload} onClear={clear} accept="application/pdf" maxFileSize={1000000} />
+            <FileUpload 
+                name="file" 
+                customUpload 
+                uploadHandler={onUpload} 
+                onClear={clear} 
+                accept="application/pdf" 
+                maxFileSize={1000000} 
+                chooseLabel="Select" 
+                uploadLabel="Summary" 
+            />
             <OverlayPanel ref={overlayPanelRef}>
                 <div style={{ padding: '10px' }}>
                     <Button label="Submit" />
