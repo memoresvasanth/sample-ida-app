@@ -66,7 +66,7 @@ const DocumentHome: React.FC = () => {
             </OverlayPanel>
             {summary && (
                 <div style={{ marginTop: '20px' }}>
-                    <h2>Summary :</h2>
+                    <h2>Summary</h2>
                     <p>{summary}</p>
                 </div>
             )}
