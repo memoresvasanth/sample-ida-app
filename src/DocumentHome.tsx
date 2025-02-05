@@ -4,6 +4,7 @@ import { OverlayPanel } from 'primereact/overlaypanel';
 import { Button } from 'primereact/button';
 import axios from 'axios';
 import InteractionComponent from './InteractionComponent';
+import { API_URL } from './config'; // Import the URL from config.ts
 
 const DocumentHome: React.FC = () => {
     const [summary, setSummary] = useState<string>('');
@@ -26,7 +27,7 @@ const DocumentHome: React.FC = () => {
         setFileStatus('Uploading');
 
         try {
-            const response = await axios.post('http://127.0.0.1:9002/summarize', formData, {
+            const response = await axios.post(API_URL, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
