@@ -3,6 +3,7 @@ import { Button } from 'primereact/button';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Dialog } from 'primereact/dialog';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { SpeedDial } from 'primereact/speeddial';
 import axios from 'axios';
 
 const InteractionComponent: React.FC = () => {
@@ -13,6 +14,7 @@ const InteractionComponent: React.FC = () => {
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
     const [showDialog, setShowDialog] = useState<boolean>(false);
+    const [showSpeedDialOptions, setShowSpeedDialOptions] = useState<boolean>(false);
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const startRecording = async () => {
@@ -32,6 +34,7 @@ const InteractionComponent: React.FC = () => {
         recorder.start();
         setMediaRecorder(recorder);
         setRecording(true);
+        setShowSpeedDialOptions(true); // Keep SpeedDial options open
     };
 
     const stopRecording = () => {
@@ -88,13 +91,52 @@ const InteractionComponent: React.FC = () => {
         setShowDialog(false);
     };
 
+    const items = [
+        {
+            label: recording ? "Stop" : "Start",
+            icon: recording ? "pi pi-stop" : "pi pi-microphone",
+            command: recording ? stopRecording : startRecording
+        },
+        {
+            label: "Play",
+            icon: "pi pi-play",
+            command: () => {
+                audioRef.current?.play();
+                setShowSpeedDialOptions(true); // Keep SpeedDial options open
+            },
+            disabled: !audioBlob
+        },
+        {
+            label: "Send",
+            icon: "pi pi-send",
+            command: sendRecording,
+            disabled: !audioBlob
+        },
+        {
+            label: "Download",
+            icon: "pi pi-download",
+            command: downloadRecording,
+            disabled: !audioBlob
+        },
+        {
+            label: "Close",
+            icon: "pi pi-times",
+            command: () => setShowSpeedDialOptions(false)
+        }
+    ];
+
     return (
         <div style={{ position: 'fixed', bottom: 0, width: '100%', backgroundColor: 'white', padding: '5px', boxShadow: '0 -2px 5px rgba(0,0,0,0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0px', marginTop: '0px' }}>
-                <Button label={recording ? "Stop" : "Start"} onClick={recording ? stopRecording : startRecording} style={{ margin: '10px' }} />
-                <Button label="Play" onClick={() => audioRef.current?.play()} disabled={!audioBlob} style={{ margin: '10px' }} />
-                <Button label="Send" onClick={sendRecording} disabled={!audioBlob} style={{ margin: '10px' }} />
-                <Button label="Download" onClick={downloadRecording} disabled={!audioBlob} style={{ margin: '10px' }} />
+                <SpeedDial 
+                    model={items} 
+                    direction="up" 
+                    visible={showSpeedDialOptions} 
+                    onClick={() => setShowSpeedDialOptions(true)} 
+                    buttonClassName="p-button-secondary" 
+                    showIcon="pi pi-cog" 
+                    style={{ margin: '10px', position: 'fixed', bottom: '20px', right: '20px' }} 
+                />
             </div>
             <audio ref={audioRef} src={audioBlob ? URL.createObjectURL(audioBlob) : undefined} />
             {loading && (
