@@ -27,7 +27,7 @@ const DocumentHome: React.FC = () => {
         setFileStatus('Uploading');
 
         try {
-            const response = await axios.post(API_URL, formData, {
+            const response = await axios.post(API_URL+'/summarize', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
